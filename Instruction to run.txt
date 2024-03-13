@@ -1,0 +1,7 @@
+Some commands need to run in terminal window to view E-commerce website.
+1. python manage.py makemigrations auctions
+2.python manage.py migrate
+3.python manage.py runserver
+4.Before creating listing first define category through admin
+
+Provided some screenshots, if incase program not run

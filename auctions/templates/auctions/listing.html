@@ -1,0 +1,85 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        {% if listing.isActive == False and user.username == listing.price.user.username %}
+            <div class="alert alert-success" role="alert" >
+                <b>Congratulation!!! You won the {{listing.title}} at ${{listing.price}} .</b>
+            </div>
+        {% endif %}
+    </div>
+    <div class = "container">
+        {%  if message %}
+            {% if update %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                {{message}}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+            {% if isOwner and listing.isActive %}
+                <form action="{% url 'CloseAuction' id=listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class = "btn btn-danger">Close</button>
+                </form>
+            {% endif %}
+        <!-- How to show that it is addedi in watchlist or not -->
+            {% if isListinginWatchlist %}
+                <!-- ThiS way we can do certain thing like removing from watchlist or adding from just CLICKING THE BUTTON-->
+                <form action="{% url 'removefromWatchlist' id=listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class = "btn btn-danger">Remove from Watchlist</button>
+                </form>
+            {% else %}
+                <form action="{% url 'addtoWatchlist' id=listing.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class = "btn btn-success">Add to Watchlist</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <h3>Pokemon : {{ listing.title }}</h3>
+    <img src="{{ listing.imageUrl }}" alt="{{ listing.title }}" height="300px">
+    <p>{{ listing.description }}</p>
+    <p>Owner : {{listing.owner}} </p>
+    <h5>Price: $ {{listing.price.bid}}</h5>
+
+    {% if user.is_authenticated and listing.isActive %}
+        <form action="{% url 'addBid' listing.id %}" method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="price">Add Bid: </label>
+                <input type="number" min="0" name="newBid" placeholder="Add new Bid">
+                <button type="submit" class="btn btn-warning">Add</button>
+            </div>
+        </form>
+    {% endif %}
+    
+
+    <H2>Comments</H2>
+    <br>
+            {% if user.is_authenticated %}
+                <form action="{% url 'addcomment' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <div>
+                    <label for="newComment">Add Comment: </label>
+                    <input type="text" name="newComment" placeholder="Add new comment">
+                    <button type="submit" class="btn btn-warning">Add</button>
+                    </div>
+                </form>
+            {% endif %}
+                <br>
+<ul class="list-group">
+    {% for comment in allcomments %}
+        <!--This way we can go into the comment and get message  -->
+        <li class="list-group-item">{{comment.message}} <br>Posted by <b>{{comment.author}}</b></li>
+    {% endfor %}
+</ul>    
+{% endblock %}
